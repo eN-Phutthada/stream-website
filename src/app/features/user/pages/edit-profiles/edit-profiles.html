@@ -1,0 +1,91 @@
+<div class="screen">
+  <div class="brand">
+    <img src="assets/logo.png" alt="Stream Logo" class="logo" />
+    <h1>STREAM</h1>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <!-- ซ้าย: อัปโหลด/พรีวิวอวาตาร์ -->
+      <div class="left">
+        <label class="avatar-box">
+          <img
+            *ngIf="avatarPreview(); else avatarFallback"
+            [src]="avatarPreview()!"
+            alt="avatar preview"
+          />
+          <ng-template #avatarFallback>
+            <!-- ถ้ามีรูปเดิมจากโปรไฟล์ ให้โชว์แทน placeholder -->
+            <img
+              *ngIf="(profile$ | async)?.avatarUrl as url; else placeholder"
+              [src]="url"
+              alt="current avatar"
+              (error)="onImgError($event)"
+            />
+          </ng-template>
+
+          <ng-template #placeholder>
+            <div class="placeholder">โปรไฟล์</div>
+          </ng-template>
+
+          <input
+            type="file"
+            name="avatar"
+            accept="image/*"
+            (change)="onFileChange($event)"
+          />
+        </label>
+        <div class="avatar-hint">เปลี่ยนรูปโปรไฟล์</div>
+
+        <div class="avatar-actions">
+          <button class="btn primary" (click)="uploadAvatar()" [disabled]="!avatarFile()">อัปโหลด</button>
+          <button class="btn danger" (click)="removeAvatar()">ลบรูป</button>
+        </div>
+      </div>
+
+      <!-- ขวา: ฟอร์มข้อมูล -->
+      <div class="right">
+        <form [formGroup]="form" (ngSubmit)="saveProfile()" novalidate class="info-form">
+          <label for="displayName">ชื่อที่แสดง</label>
+          <input
+            id="displayName"
+            type="text"
+            placeholder="ตั้งชื่อที่แสดง"
+            formControlName="displayName"
+            [class.invalid]="f.displayName.touched && f.displayName.invalid"
+            autocomplete="name"
+          />
+          <span class="hint" *ngIf="f.displayName.touched && f.displayName.hasError('required')">
+            กรุณากรอกชื่อที่แสดง
+          </span>
+          <span class="hint" *ngIf="f.displayName.touched && f.displayName.hasError('minlength')">
+            อย่างน้อย 3 ตัวอักษร
+          </span>
+
+          <label for="email">อีเมล</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="name@example.com"
+            formControlName="email"
+            [class.invalid]="f.email.touched && f.email.invalid"
+            autocomplete="email"
+          />
+          <div class="hint" *ngIf="f.email.touched && f.email.hasError('required')">
+            กรุณากรอกอีเมล
+          </div>
+          <div class="hint" *ngIf="f.email.touched && f.email.hasError('email')">
+            รูปแบบอีเมลไม่ถูกต้อง
+          </div>
+
+          <div class="error" *ngIf="errorMsg()">{{ errorMsg() }}</div>
+
+          <div class="actions">
+            <button type="submit" class="btn primary" [disabled]="loading()">บันทึก</button>
+            <button type="button" class="btn outline" (click)="back()">ย้อนกลับ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
